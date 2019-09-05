@@ -1,4 +1,5 @@
 ```
 npm install -g ts-node
-ts-node rename-component-templates.ts | tee log
+cd client_app
+ts-node client-app-rename-scripts/rename-component-templates.ts | tee log
 ```
