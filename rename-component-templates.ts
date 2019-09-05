@@ -42,27 +42,29 @@ interface Status {
   code: string;
 }
 
-const OK: Status = {
-  color: Color.GREEN,
-  code: "OK"
-};
-const NOOP: Status = {
-  // foo.component.html already exists
-  color: Color.CYAN,
-  code: "NOOP"
-};
-const NO_TEMPLATE_URL_FOUND: Status = {
-  color: Color.YELLOW,
-  code: "NOURL"
-};
-const UNEXPECTED_TEMPLATE_URL: Status = {
-  // foo.component.ts has a templateUrl other than foo.tpl.html or foo.component.html
-  color: Color.YELLOW,
-  code: "WRONG"
-};
-const NO_TEMPLATE: Status = {
-  color: Color.YELLOW,
-  code: "MISSING"
+const stasuses = {
+  OK: {
+    color: Color.GREEN,
+    code: "OK"
+  },
+  NOOP: {
+    // foo.component.html already exists
+    color: Color.CYAN,
+    code: "NOOP"
+  },
+  NO_TEMPLATE_URL_FOUND: {
+    color: Color.YELLOW,
+    code: "NOURL"
+  },
+  UNEXPECTED_TEMPLATE_URL: {
+    // foo.component.ts has a templateUrl other than foo.tpl.html or foo.component.html
+    color: Color.YELLOW,
+    code: "WRONG"
+  },
+  NO_TEMPLATE: {
+    color: Color.YELLOW,
+    code: "MISSING"
+  }
 };
 
 function main() {
@@ -100,10 +102,9 @@ function getPaths(tsPath: string) {
 
 function rename(tsPath: string) {
   const paths = getPaths(tsPath);
-
   // If foo.component.html already exists, do nothing.
   if (existsSync(paths.newHtmlPathFull)) {
-    logStatus(NOOP, tsPath);
+    logStatus(stasuses.NOOP, tsPath);
     return;
   }
 
@@ -112,7 +113,7 @@ function rename(tsPath: string) {
   const templateUrlRegex = /templateUrl: "([^"]*)"/;
   const match = tsContents.match(templateUrlRegex);
   if (!match) {
-    logStatus(NO_TEMPLATE_URL_FOUND, tsPath);
+    logStatus(stasuses.NO_TEMPLATE_URL_FOUND, tsPath);
     return;
   }
 
@@ -122,20 +123,20 @@ function rename(tsPath: string) {
     templateUrlInFile !== paths.oldHtmlPathRelative &&
     "./" + templateUrlInFile !== paths.oldHtmlPathRelative
   ) {
-    logStatus(UNEXPECTED_TEMPLATE_URL, tsPath);
+    logStatus(stasuses.UNEXPECTED_TEMPLATE_URL, tsPath);
     return;
   }
 
   // Check foo.tpl.html exists
   if (!existsSync(paths.oldHtmlPathFull)) {
-    logStatus(NO_TEMPLATE, tsPath);
+    logStatus(stasuses.NO_TEMPLATE, tsPath);
     return;
   }
 
   const newTemplateUrl = `templateUrl: "${paths.newHtmlPathRelative}"`;
   writeFileSync(tsPath, tsContents.replace(templateUrlRegex, newTemplateUrl));
   renameSync(paths.oldHtmlPathFull, paths.newHtmlPathFull);
-  logStatus(OK, tsPath);
+  logStatus(stasuses.OK, tsPath);
 }
 
 function logStatus(status: Status, tsPath: string) {
