@@ -1,3 +1,5 @@
+declare const require: any;
+
 const execSync: (
   command: string,
   options?: any
