@@ -1,4 +1,4 @@
-declare const require: any;
+declare var require: any;
 
 const execSync: (
   command: string,
